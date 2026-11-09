@@ -1,0 +1,18 @@
+[
+  {
+    "keyword": "contact",
+    "text": "You can reach our support lead at jane.doe@acme-corp.com during business hours. Her backup is j.smith@acme-corp.co.uk, and general questions go to the help desk."
+  },
+  {
+    "keyword": "payment",
+    "text": "The card on file is 4111 1111 1111 1111 and the backup card is 5500-0000-0000-0004. Order 1234567890123 shipped on Monday and should arrive this week."
+  },
+  {
+    "keyword": "identity",
+    "text": "The customer's SSN is 123-45-6789 and it was verified last month. Reference number 123-45-67890 belongs to a different system."
+  },
+  {
+    "keyword": "default",
+    "text": "Hello! Customer John Carter (john.carter@example.com, SSN 078-05-1120) paid with card 378282246310005 yesterday. Let me know if you need anything else."
+  }
+]
