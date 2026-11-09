@@ -1,0 +1,41 @@
+[
+  {
+    "name": "get_customer",
+    "description": "Retrieve a customer's information by ID.",
+    "inputSchema": {
+      "type": "object",
+      "properties": { "customer_id": { "type": "string", "pattern": "^CUST-[0-9]{5}$" } },
+      "required": ["customer_id"],
+      "additionalProperties": false
+    }
+  },
+  {
+    "name": "list_orders",
+    "description": "List orders, optionally filtered by customer ID.",
+    "inputSchema": {
+      "type": "object",
+      "properties": { "customer_id": { "type": "string", "pattern": "^CUST-[0-9]{5}$" } },
+      "additionalProperties": false
+    }
+  },
+  {
+    "name": "admin_reset_key",
+    "description": "Admin only: rotate an API key.",
+    "inputSchema": {
+      "type": "object",
+      "properties": { "key_id": { "type": "string" } },
+      "required": ["key_id"],
+      "additionalProperties": false
+    }
+  },
+  {
+    "name": "admin_delete_customer",
+    "description": "Admin only: delete a customer's data.",
+    "inputSchema": {
+      "type": "object",
+      "properties": { "customer_id": { "type": "string", "pattern": "^CUST-[0-9]{5}$" } },
+      "required": ["customer_id"],
+      "additionalProperties": false
+    }
+  }
+]

@@ -1,0 +1,5 @@
+[
+  { "order_id": "ORD-1001", "customer_id": "CUST-12345", "total": 59.99, "status": "delivered" },
+  { "order_id": "ORD-1002", "customer_id": "CUST-12345", "total": 25.0, "status": "shipped" },
+  { "order_id": "ORD-1003", "customer_id": "CUST-67890", "total": 120.5, "status": "processing" }
+]

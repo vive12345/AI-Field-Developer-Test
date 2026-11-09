@@ -1,0 +1,5 @@
+[
+  { "customer_id": "CUST-12345", "name": "Alice Johnson", "email": "alice@example.com", "tier": "gold" },
+  { "customer_id": "CUST-67890", "name": "Bob Smith", "email": "bob@example.com", "tier": "silver" },
+  { "customer_id": "CUST-24680", "name": "Carol Diaz", "email": "carol@example.com", "tier": "bronze" }
+]
