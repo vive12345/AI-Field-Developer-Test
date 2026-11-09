@@ -60,12 +60,16 @@ class SlidingWindowRateLimiter:
         return sqlite3.connect(self._db_path, timeout=5.0, isolation_level=None)
 
     def try_acquire(self, tenant_id: str, tokens: int, limit: int) -> RateLimitDecision:
-        now = self._clock()
-        window_start = now - self._window
-
         with closing(self._connect()) as conn:
             conn.execute("BEGIN IMMEDIATE")
             try:
+                # Read the clock only once the write lock is held. Reading it
+                # earlier lets a request that waited for the lock stamp an older
+                # time than reservations committed while it waited, which breaks
+                # window ordering and makes Retry-After exceed the window.
+                now = self._clock()
+                window_start = now - self._window
+
                 # Eviction: drop every row (any tenant) that has left the window.
                 conn.execute("DELETE FROM token_usage WHERE created_at <= ?", (window_start,))
 

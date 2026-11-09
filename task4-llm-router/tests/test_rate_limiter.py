@@ -1,6 +1,7 @@
 """Sliding-window limiter: accounting, eviction, retry-after, persistence and concurrency."""
 
 import sqlite3
+import threading
 from concurrent.futures import ThreadPoolExecutor
 
 from llm_router.rate_limiter import SlidingWindowRateLimiter
@@ -128,6 +129,25 @@ def test_concurrent_acquires_never_overshoot_the_limit(db_path, clock):
 
     assert sum(d.allowed for d in decisions) == 25  # 25 x 2,000 = 50,000
     assert limiter.usage("acme") == LIMIT
+
+
+def test_retry_after_never_exceeds_the_window_under_contention(db_path):
+    # Every request wants the whole budget and all start at once: one wins, and
+    # the rest wait for its write lock. Those waiters must read the clock after
+    # the winner committed, otherwise Retry-After comes out longer than the window.
+    limiter = SlidingWindowRateLimiter(db_path, window_seconds=60)
+    start = threading.Barrier(16)
+
+    def contend(_):
+        start.wait()
+        return limiter.try_acquire("acme", 2_000, 2_000)
+
+    with ThreadPoolExecutor(max_workers=16) as pool:
+        decisions = list(pool.map(contend, range(16)))
+
+    rejected = [d for d in decisions if not d.allowed]
+    assert len(rejected) == 15
+    assert max(d.retry_after_seconds for d in rejected) <= 60
 
 
 def test_two_gateway_instances_sharing_the_file_stay_consistent(db_path, clock):
