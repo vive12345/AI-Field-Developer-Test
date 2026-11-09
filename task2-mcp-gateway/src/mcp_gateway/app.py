@@ -21,7 +21,7 @@ from fastapi.responses import JSONResponse
 from mcp_gateway import __version__
 from mcp_gateway.auth import TokenStore, authenticate
 from mcp_gateway.config import Settings
-from mcp_gateway.jsonrpc import JsonRpcError, parse_message
+from mcp_gateway.jsonrpc import JsonRpcError, JsonRpcMessage, parse_message
 from mcp_gateway.policy import authorize
 from mcp_gateway.proxy import DownstreamClient
 
@@ -64,24 +64,30 @@ def create_app(
         try:
             identity = authenticate(request.headers.get("authorization"), token_store)
             message = parse_message(await request.body())
-            authorize(identity, message)
         except JsonRpcError as error:
             logger.warning("Rejected request: %s (code %s)", error.message, error.code)
             return _error_response(error)
 
-        logger.info(
-            "Forwarding %s%s for user=%s role=%s",
-            message.method,
-            f" ({message.params['name']})" if message.method == "tools/call" else "",
-            identity.user,
-            identity.role.value,
-        )
+        caller = f"user={identity.user} role={identity.role.value}"
+        try:
+            authorize(identity, message)
+        except JsonRpcError as error:
+            # Audit trail: who attempted what, and why it was blocked.
+            logger.warning("DENIED %s for %s: %s (code %s)", _describe(message), caller, error.message, error.code)
+            return _error_response(error)
+
+        logger.info("Forwarding %s for %s", _describe(message), caller)
         try:
             return await request.app.state.downstream.forward(message, request.headers, identity)
         except JsonRpcError as error:
             return _error_response(error)
 
     return app
+
+
+def _describe(message: JsonRpcMessage) -> str:
+    tool_name = message.params.get("name")
+    return f"{message.method} ({tool_name!r})" if message.method == "tools/call" else message.method
 
 
 def _error_response(error: JsonRpcError) -> JSONResponse:
