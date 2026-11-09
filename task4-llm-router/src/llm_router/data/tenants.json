@@ -1,0 +1,7 @@
+{
+  "tenants": [
+    { "api_key": "tenant-acme-key", "tenant_id": "acme", "tokens_per_minute": 50000 },
+    { "api_key": "tenant-globex-key", "tenant_id": "globex", "tokens_per_minute": 50000 },
+    { "api_key": "tenant-tiny-key", "tenant_id": "tiny", "tokens_per_minute": 2000 }
+  ]
+}
