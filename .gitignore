@@ -9,6 +9,11 @@ dist/
 .venv/
 venv/
 
+# Local databases (runtime state, e.g. Task 4 rate-limiter)
+*.db
+*.db-wal
+*.db-shm
+
 # Tooling caches
 .pytest_cache/
 .mypy_cache/
